@@ -16,9 +16,10 @@ Then open the printed local URL (usually http://localhost:5173).
 
 ## Demo login
 
-- Email: `demo@example.com`
+- Email: `sheslovely2@gmail.com`
 - Password: `Demo123!`
-- One-time verification code (login and transfer): `123456`
+- One-time verification code (login and transfer): `070514`
+- "Remember me" on the login screen persists the session in `localStorage` so you skip sign-in on the next visit; "Sign out" clears it.
 
 ## Notes
 
