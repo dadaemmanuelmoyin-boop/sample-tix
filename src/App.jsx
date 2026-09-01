@@ -97,6 +97,7 @@ const EVENTS_CONFIG = [
     image: EVENT_IMAGE,
     imagePosition: "center top",
     package: "VIP PIT STAR PACKAGE",
+    saleType: "Artist Presale",
     section: "GA",
     admission: "GENERAL ADMISSION",
     ticketCount: 3,
@@ -113,6 +114,7 @@ const EVENTS_CONFIG = [
     image: PLAVE_IMAGE,
     imagePosition: "center top",
     package: "GENERAL ADMISSION FLOOR",
+    saleType: "Artist Presale",
     section: "GA",
     admission: "GENERAL ADMISSION",
     ticketCount: 2,
@@ -129,6 +131,7 @@ const EVENTS_CONFIG = [
     image: HARRY_IMAGE,
     imagePosition: "center 20%",
     package: "GENERAL ADMISSION PIT",
+    saleType: "Artist Presale",
     section: "GA",
     admission: "GENERAL ADMISSION",
     ticketCount: 4,
@@ -145,6 +148,7 @@ const EVENTS_CONFIG = [
     image: null,
     imagePosition: "center top",
     package: "GENERAL ADMISSION",
+    saleType: "Artist Presale",
     section: "GA",
     admission: "GENERAL ADMISSION",
     ticketCount: 1,
@@ -159,6 +163,7 @@ function buildInitialOrders() {
       id: evt.id + "-t" + (i + 1),
       label: "GA " + (i + 1),
       package: evt.package,
+      saleType: evt.saleType,
       type: evt.admission,
       section: evt.section,
       status: "ACTIVE",
@@ -605,7 +610,7 @@ function OrderDetailScreen({ order, onBack, onTransfer, onViewHistory }) {
             {tickets.map((t) => (
               <div key={t.id} className="border border-gray-300 rounded-md overflow-hidden">
                 <div className="bg-gray-200 px-4 py-3 flex items-center justify-between gap-2">
-                  <div className="text-sm font-extrabold text-gray-900 tracking-wide">{t.package}</div>
+                  <div className="text-sm font-bold text-gray-900">{t.saleType}</div>
                   <div className="flex items-center gap-2 shrink-0">
                     <span className="text-xs font-semibold text-gray-500">{t.label}</span>
                     {t.status !== "ACTIVE" && <StatusBadge status={t.status} />}
