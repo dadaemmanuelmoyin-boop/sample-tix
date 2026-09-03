@@ -720,11 +720,11 @@ function TransferSelectScreen({ order, preselected, onBack, onCancel, onContinue
       <div className="pointer-events-none select-none opacity-50 blur-sm">
         <OrderDetailScreen order={order} onBack={() => {}} onTransfer={() => {}} onViewHistory={() => {}} />
       </div>
-      <div className="absolute inset-0 bg-black/30" onClick={onCancel} />
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={onCancel} />
 
       <div
-        className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl shadow-2xl px-4 pt-3 pb-4 flex flex-col"
-        style={{ maxHeight: "72%" }}
+        className="fixed left-0 right-0 bottom-0 bg-white rounded-t-2xl shadow-2xl px-4 pt-3 pb-4 flex flex-col mx-auto z-50"
+        style={{ maxHeight: "72vh", maxWidth: "480px" }}
       >
         <div className="w-10 h-1.5 bg-gray-300 rounded-full mx-auto mb-3" />
 
