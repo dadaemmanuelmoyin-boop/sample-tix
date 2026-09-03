@@ -101,6 +101,7 @@ const EVENTS_CONFIG = [
     section: "GA",
     admission: "GENERAL ADMISSION",
     ticketCount: 3,
+    coords: { lat: 19.4046, lng: -99.0987 },
   },
   {
     id: "evt-midnight-echo",
@@ -118,6 +119,7 @@ const EVENTS_CONFIG = [
     section: "GA",
     admission: "GENERAL ADMISSION",
     ticketCount: 2,
+    coords: { lat: 34.1447, lng: -118.1445 },
   },
   {
     id: "evt-solar-static",
@@ -127,14 +129,35 @@ const EVENTS_CONFIG = [
     titleLine3: "",
     venue: "Madison Square Garden",
     city: "New York, NY",
-    dateLabel: "WED, SEP 02, 2026 \u2022 8:00 PM",
+    dateLabel: "FRI, SEP 04, 2026 \u2022 8:00 PM",
     image: HARRY_IMAGE,
     imagePosition: "center 20%",
     package: "GENERAL ADMISSION PIT",
     saleType: "Artist Presale",
     section: "GA",
+    ticketSections: ["LFTGA", "LFTGA", "RGTGA", "RGTGA"],
     admission: "GENERAL ADMISSION",
     ticketCount: 4,
+    coords: { lat: 40.7505, lng: -73.9934 },
+  },
+  {
+    id: "evt-harry-styles-2",
+    name: "HARRY STYLES: TOGETHER, TOGETHER",
+    title: "HARRY STYLES:",
+    titleLine2: "TOGETHER, TOGETHER",
+    titleLine3: "",
+    venue: "Madison Square Garden",
+    city: "New York, NY",
+    dateLabel: "SAT, SEP 05, 2026 \u2022 8:00 PM",
+    image: HARRY_IMAGE,
+    imagePosition: "center 20%",
+    package: "GENERAL ADMISSION PIT",
+    saleType: "Artist Presale",
+    section: "GA",
+    ticketSections: ["LFTGA", "LFTGA", "RGTGA", "RGTGA"],
+    admission: "GENERAL ADMISSION",
+    ticketCount: 4,
+    coords: { lat: 40.7505, lng: -73.9934 },
   },
   {
     id: "evt-paper-crowns",
@@ -152,6 +175,7 @@ const EVENTS_CONFIG = [
     section: "GA",
     admission: "GENERAL ADMISSION",
     ticketCount: 1,
+    coords: { lat: 41.8888, lng: -87.6354 },
   },
 ];
 
@@ -165,7 +189,7 @@ function buildInitialOrders() {
       package: evt.package,
       saleType: evt.saleType,
       type: evt.admission,
-      section: evt.section,
+      section: evt.ticketSections ? evt.ticketSections[i] : evt.section,
       status: "ACTIVE",
     })),
   }));
@@ -322,32 +346,45 @@ function EventHeroCard({ order, ticketCount, onBack, onMenu }) {
   );
 }
 
-function MapPlaceholder() {
+function VenueMap({ order }) {
+  const coords = order.coords;
+  if (!coords) {
+    return (
+      <div className="relative w-full h-56 overflow-hidden bg-gray-100 flex items-center justify-center text-sm text-gray-500">
+        Map unavailable
+      </div>
+    );
+  }
+  const { lat, lng } = coords;
+  const delta = 0.008;
+  const bbox = [lng - delta, lat - delta, lng + delta, lat + delta].join("%2C");
+  const embedSrc =
+    "https://www.openstreetmap.org/export/embed.html?bbox=" +
+    bbox +
+    "&layer=mapnik&marker=" +
+    lat +
+    "%2C" +
+    lng;
+  const directionsHref =
+    "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(order.venue + ", " + order.city);
+
   return (
     <div className="relative w-full h-56 overflow-hidden bg-gray-100">
-      <svg width="100%" height="100%" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice">
-        <rect width="400" height="260" fill="#EFEDE6" />
-        <rect x="0" y="40" width="400" height="30" fill="#F6E9B8" opacity="0.6" />
-        <rect x="150" y="0" width="90" height="260" fill="#dfe6d8" />
-        <circle cx="230" cy="90" r="55" fill="#cfe0c4" />
-        <circle cx="80" cy="200" r="40" fill="#cfe0c4" />
-        {[20, 70, 150, 230, 310, 380].map((x) => (
-          <line key={"v" + x} x1={x} y1="0" x2={x} y2="260" stroke="#d7d2c4" strokeWidth="3" />
-        ))}
-        {[30, 90, 150, 210].map((y) => (
-          <line key={"h" + y} x1="0" y1={y} x2="400" y2={y} stroke="#d7d2c4" strokeWidth="3" />
-        ))}
-        <line x1="0" y1="130" x2="400" y2="150" stroke="#ffffff" strokeWidth="6" />
-        <line x1="0" y1="130" x2="400" y2="150" stroke="#f4c542" strokeWidth="2" strokeDasharray="6 4" />
-      </svg>
-      <div className="absolute left-1/2 top-1/3 -translate-x-1/2 -translate-y-full flex flex-col items-center">
-        <div className="w-6 h-6 rounded-full bg-blue-600 border-2 border-white shadow flex items-center justify-center">
-          <MapPin size={12} className="text-white" />
-        </div>
-        <div className="text-gray-900 bg-white/80 px-1 rounded mt-0.5" style={{ fontSize: "10px", fontWeight: 600 }}>
-          VENUE
-        </div>
-      </div>
+      <iframe
+        title={order.venue + " map"}
+        src={embedSrc}
+        className="w-full h-full border-0"
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+      />
+      <a
+        href={directionsHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="absolute bottom-3 left-3 bg-white text-gray-900 text-xs font-semibold px-3 py-1.5 rounded-full shadow flex items-center gap-1.5"
+      >
+        <MapPin size={13} className="text-blue-600" /> Get Directions
+      </a>
     </div>
   );
 }
@@ -637,7 +674,7 @@ function OrderDetailScreen({ order, onBack, onTransfer, onViewHistory }) {
 
           <div className="mt-5">
             <div className="px-4 text-sm font-extrabold text-gray-900 mb-2">MORE OPTIONS</div>
-            <MapPlaceholder />
+            <VenueMap order={order} />
           </div>
 
           <GetDirectionsSection order={order} />
@@ -679,14 +716,36 @@ function TransferSelectScreen({ order, preselected, onBack, onCancel, onContinue
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-white">
-      <TopBar title="Transfer Tickets" onCancel={onCancel} tone="blue" />
-      <div className="p-4">
-        <div className="text-xs font-semibold tracking-wide text-gray-500">SELECT TICKETS TO TRANSFER</div>
-        <div className="text-sm font-semibold text-gray-900 mt-1">Sec {order.section}, Row {order.admission}</div>
-        <div className="text-xs text-gray-500">{tickets.length} Tickets</div>
+    <div className="min-h-full relative bg-white">
+      <div className="pointer-events-none select-none opacity-50 blur-sm">
+        <OrderDetailScreen order={order} onBack={() => {}} onTransfer={() => {}} onViewHistory={() => {}} />
+      </div>
+      <div className="absolute inset-0 bg-black/30" onClick={onCancel} />
 
-        <div className="mt-4 flex flex-col gap-2">
+      <div
+        className="absolute left-0 right-0 bottom-0 bg-white rounded-t-2xl shadow-2xl px-4 pt-3 pb-4 flex flex-col"
+        style={{ maxHeight: "72%" }}
+      >
+        <div className="w-10 h-1.5 bg-gray-300 rounded-full mx-auto mb-3" />
+
+        <div className="flex items-center justify-between mb-1">
+          <span />
+          <div className="text-center flex-1 text-base font-extrabold text-gray-900 tracking-wide">
+            SELECT TICKETS TO TRANSFER
+          </div>
+          <button onClick={onCancel} className="text-xs font-semibold text-blue-600">
+            Cancel
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between mt-3 mb-3">
+          <div className="text-sm font-semibold text-gray-900">
+            Sec {order.section}, Row {order.admission}
+          </div>
+          <div className="text-sm text-gray-400">{tickets.length} Tickets</div>
+        </div>
+
+        <div className="flex gap-3 overflow-x-auto pb-1">
           {tickets.map((t) => {
             const disabled = t.status !== "ACTIVE";
             const isChecked = selected.has(t.id);
@@ -698,41 +757,46 @@ function TransferSelectScreen({ order, preselected, onBack, onCancel, onContinue
                 onClick={() => toggle(t.id)}
                 aria-pressed={isChecked}
                 className={
-                  "flex items-center justify-between border-2 rounded-md px-3 h-12 text-left transition-colors " +
-                  (disabled
-                    ? "border-gray-300 bg-gray-50 opacity-60"
-                    : isChecked
-                    ? "border-blue-600 bg-blue-50"
-                    : "border-gray-300 bg-white hover:border-gray-400")
+                  "w-20 shrink-0 rounded-lg overflow-hidden border transition-colors " +
+                  (disabled ? "border-gray-300 opacity-50" : "border-gray-300")
                 }
               >
-                <div>
-                  <div className={"text-sm font-medium " + (isChecked ? "text-blue-600" : "text-gray-900")}>{t.label}</div>
-                  {disabled && <div className="text-xs text-gray-500">{t.status.replace("_", " ")}</div>}
-                </div>
-                <span
+                <div
                   className={
-                    "w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors " +
-                    (isChecked ? "border-blue-600 bg-blue-600" : "border-gray-300 bg-white")
+                    "h-10 flex items-center justify-center text-white text-sm font-bold " +
+                    (disabled ? "bg-gray-400" : "bg-blue-600")
                   }
                 >
-                  {isChecked && <Check size={12} className="text-white" strokeWidth={3} />}
-                </span>
+                  {t.label}
+                </div>
+                <div className="h-14 flex items-center justify-center bg-white">
+                  <span
+                    className={
+                      "w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors " +
+                      (isChecked ? "border-blue-600 bg-blue-600" : "border-gray-300 bg-white")
+                    }
+                  >
+                    {isChecked && <Check size={13} className="text-white" strokeWidth={3} />}
+                  </span>
+                </div>
               </button>
             );
           })}
         </div>
-      </div>
 
-      <div className="mt-auto p-4 border-t border-gray-300 flex items-center justify-between gap-3">
-        <span className="text-sm text-gray-500">{selected.size} Selected</span>
-        <button
-          onClick={() => onContinue(Array.from(selected))}
-          disabled={selected.size === 0}
-          className={"flex items-center gap-1 text-sm font-semibold px-4 h-11 rounded-md " + (selected.size === 0 ? "text-gray-300" : "text-blue-600")}
-        >
-          TRANSFER TO <ChevronRight size={16} />
-        </button>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <span className="text-sm text-gray-500">{selected.size} Selected</span>
+          <button
+            onClick={() => onContinue(Array.from(selected))}
+            disabled={selected.size === 0}
+            className={
+              "flex items-center gap-1 text-sm font-semibold px-4 h-11 rounded-md " +
+              (selected.size === 0 ? "text-gray-300" : "text-blue-600")
+            }
+          >
+            TRANSFER TO <ChevronRight size={16} />
+          </button>
+        </div>
       </div>
     </div>
   );
